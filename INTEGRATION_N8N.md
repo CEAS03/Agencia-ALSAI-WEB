@@ -111,23 +111,35 @@ Workflow **publicado y activo** en n8n:
 - Hoja de bitácora: "ALSAI · Leads Diagnóstico"
   (`1s1t3tUT6hDGCFmgw7A7Whv3uf3wld_DiSwyBZgBfgUI`, pestaña `Leads`)
 
-Probado de punta a punta con un lead de prueba:
+Probado de punta a punta con leads de prueba:
 
 | Nodo | Estado |
 |---|---|
 | Webhook → Switch → Preparar lead | ✅ |
-| Guardar en Sheets | ✅ fila escrita con 21 columnas |
-| Aviso de lead a Carlos (Gmail) | ⚠️ credencial "Gmail CEAS" con token expirado |
-| Contacto + Tarea en HubSpot | ⏸️ nodos deshabilitados, falta credencial `hubspotAppToken` |
+| Guardar en Sheets | ✅ fila escrita con todas las columnas |
+| Contacto en HubSpot | ✅ contacto creado (verificado en el CRM) |
+| Tarea diagnóstico en HubSpot | ✅ tarea asociada, con el diagnóstico en el cuerpo |
+| Aviso de lead a Carlos (Gmail) | ⚠️ ver aviso de credenciales |
 
-Sheets y Gmail tienen `onError: continueRegularOutput` en la rama de datos:
-un fallo de un destino no tumba a los demás.
+Todos los nodos de destino tienen `onError: continueRegularOutput`:
+el fallo de un destino no tumba a los demás ni pierde el lead.
+
+## ⚠️ Aviso: credenciales de Gmail
+
+Existen **dos** credenciales de Gmail en n8n. La antigua ("Gmail CEAS")
+tiene el token revocado. Al guardar el workflow **desde la API**, n8n
+reasigna automáticamente por tipo y vuelve a elegir la rota, deshaciendo
+la asignación hecha a mano en la interfaz.
+
+**Fix durable:** borrar (o reconectar) la credencial "Gmail CEAS" para que
+solo quede una válida. Mientras existan las dos, después de cada edición
+del workflow por API hay que reasignar Gmail a mano en los dos nodos de
+correo y volver a publicar.
 
 ## Checklist para activar producción
 
-1. **Reconectar Gmail** en n8n (Credentials → "Gmail CEAS" → Reconnect).
-2. **HubSpot:** crear una app privada, copiar el token, crear la credencial
-   `hubspotAppToken` en n8n y **habilitar** los dos nodos de HubSpot.
-3. `VITE_N8N_WEBHOOK_URL=https://primary-production-48856.up.railway.app/webhook/diagnostico-alsai`
+1. **Gmail:** asignar la credencial de ALSAI en los dos nodos de correo
+   y publicar. Idealmente, eliminar la credencial "Gmail CEAS".
+2. `VITE_N8N_WEBHOOK_URL=https://primary-production-48856.up.railway.app/webhook/diagnostico-alsai`
    en Vercel → redeploy.
-4. Prueba el flujo completo desde un teléfono (el modo demo desaparece solo).
+3. Prueba el flujo completo desde un teléfono (el modo demo desaparece solo).
