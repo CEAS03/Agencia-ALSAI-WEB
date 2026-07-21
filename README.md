@@ -8,6 +8,7 @@ la experiencia visual del **diagnóstico exprés**, lista para conectarse a un a
 - **Deploy:** Netlify (configurado en `netlify.toml`).
 - **Decisiones de diseño:** ver [`DESIGN_BLUEPRINT.md`](./DESIGN_BLUEPRINT.md).
 - **Integración del diagnóstico:** ver [`INTEGRATION_N8N.md`](./INTEGRATION_N8N.md).
+- **SEO, prerender y medición:** ver [`SEO.md`](./SEO.md).
 
 ---
 
