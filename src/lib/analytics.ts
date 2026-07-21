@@ -36,7 +36,6 @@ export type AnalyticsEvent =
   | 'formulas_opened'
   | 'routes_cta_clicked'
   | 'contact_save_clicked'
-  | 'website_clicked'
   | 'social_clicked';
 
 /** Eventos que cuentan como conversión (se marcan para Ads/Meta). */
@@ -94,7 +93,14 @@ type Gtag = (...args: unknown[]) => void;
 interface TagWindow extends Window {
   dataLayer?: unknown[];
   gtag?: Gtag;
-  fbq?: ((...args: unknown[]) => void) & { queue?: unknown[]; loaded?: boolean };
+  fbq?: ((...args: unknown[]) => void) & {
+    /** La define fbevents.js al cargar; antes de eso todo va a `queue`. */
+    callMethod?: (...args: unknown[]) => void;
+    queue: unknown[];
+    loaded: boolean;
+    version: string;
+    push: unknown;
+  };
   _fbq?: unknown;
   _hsq?: unknown[];
 }
@@ -131,19 +137,30 @@ export function initAnalytics(): void {
     gtag('config', GA4_ID, { send_page_view: false });
   }
 
-  if (META_PIXEL_ID) {
-    const fbq: TagWindow['fbq'] = Object.assign(
-      (...args: unknown[]) => {
-        const q = fbq!.queue ?? (fbq!.queue = []);
-        q.push(args);
-      },
-      { queue: [] as unknown[], loaded: true },
-    );
-    win.fbq = win.fbq ?? fbq;
-    win._fbq = win._fbq ?? win.fbq;
+  if (META_PIXEL_ID && !win.fbq) {
+    /**
+     * Stub oficial de Meta. El detalle que NO se puede simplificar es
+     * `callMethod`: mientras fbevents.js no ha cargado, las llamadas se
+     * encolan; en cuanto carga, define `callMethod` y a partir de ahí hay
+     * que delegar en él. Un stub que siempre encola instala el pixel pero
+     * no reporta un solo evento — falla en silencio.
+     */
+    const fbq = function (this: unknown, ...args: unknown[]) {
+      if (fbq.callMethod) fbq.callMethod.apply(fbq, args);
+      else fbq.queue.push(args);
+    } as NonNullable<TagWindow['fbq']>;
+
+    fbq.queue = [];
+    fbq.loaded = true;
+    fbq.version = '2.0';
+    fbq.push = fbq;
+
+    win.fbq = fbq;
+    win._fbq = win._fbq ?? fbq;
+
     injectScript('https://connect.facebook.net/en_US/fbevents.js', 'meta-pixel-loader');
-    win.fbq('init', META_PIXEL_ID);
-    win.fbq('track', 'PageView');
+    fbq('init', META_PIXEL_ID);
+    fbq('track', 'PageView');
   }
 }
 

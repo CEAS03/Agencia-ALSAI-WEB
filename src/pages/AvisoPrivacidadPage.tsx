@@ -4,9 +4,10 @@ import { Eyebrow, MaskHeading } from '../components/ui/primitives';
 
 /**
  * AVISO DE PRIVACIDAD (/aviso-de-privacidad).
- * Contenido portado del aviso estático de la tarjeta (public/
- * aviso-privacidad.html, que se conserva por compatibilidad), adaptado
- * al contexto del sitio: aplica a clínicas y negocios de servicios.
+ * Contenido portado del aviso estático de la tarjeta, adaptado al
+ * contexto del sitio: aplica a clínicas y negocios de servicios.
+ * La URL antigua (/aviso-privacidad.html) redirige aquí con un 301
+ * definido en vercel.json.
  */
 export default function AvisoPrivacidadPage() {
   const rootRef = useRef<HTMLDivElement>(null);

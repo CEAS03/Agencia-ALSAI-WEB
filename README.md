@@ -66,9 +66,9 @@ Copia `.env.example` a `.env`:
 `src/lib/analytics.ts` emite estos eventos a todos los sinks disponibles
 (consola en dev, `dataLayer` si existe, HubSpot si hay portal):
 
-`landing_view` · `diagnostic_opened` · `diagnostic_started` · `lead_form_completed` ·
-`diagnostic_completed` · `contact_save_clicked` · `meeting_requested` ·
-`website_clicked` · `social_clicked`
+`primary_cta_click` · `diagnostic_start` · `diagnostic_complete` · `generate_lead` ·
+`whatsapp_click` · `schedule_call_click` · `page_view` · `diagnostic_opened` ·
+`formulas_opened` · `routes_cta_clicked` · `contact_save_clicked` · `social_clicked`
 
 **Conectar HubSpot después:** añade el script de tracking de HubSpot en `index.html`
 (o cárgalo desde un loader) y define `VITE_HUBSPOT_PORTAL_ID`; el sink ya empuja los
