@@ -76,7 +76,14 @@ export default function NosotrosPage() {
               <div className="founder-card">
                 <div className="founder-photo" aria-hidden={site.founder.photoSrc ? undefined : true}>
                   {site.founder.photoSrc ? (
-                    <img src={site.founder.photoSrc} alt={site.founder.name} />
+                    <img
+                      src={site.founder.photoSrc}
+                      alt={`${site.founder.name}, ${site.founder.role}`}
+                      width={220}
+                      height={220}
+                      loading="lazy"
+                      decoding="async"
+                    />
                   ) : (
                     <span className="founder-monogram">CA</span>
                   )}

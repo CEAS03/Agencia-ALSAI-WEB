@@ -34,7 +34,7 @@ export function BlindafonProof() {
           href={BLINDAFON_LINK}
           target="_blank"
           rel="noopener noreferrer"
-          onClick={() => track('blindafon_bot_clicked')}
+          onClick={() => track('whatsapp_click', { origen: 'caso-blindafon' })}
         >
           <IconWhatsApp className="bf-cta-icon" />
           <span className="bf-cta-label">

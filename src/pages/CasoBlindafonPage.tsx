@@ -181,7 +181,7 @@ export default function CasoBlindafonPage() {
               href={BLINDAFON_LINK}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={() => track('blindafon_bot_clicked')}
+              onClick={() => track('whatsapp_click', { origen: 'caso-blindafon' })}
               data-cursor="hot"
             >
               <IconWhatsApp />

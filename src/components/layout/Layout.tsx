@@ -11,6 +11,7 @@ import { DiagnosticContext } from '../ui/buttons';
 import { NavBar } from './NavBar';
 import { SiteFooter } from './SiteFooter';
 import { CursorHalo } from './CursorHalo';
+import { useSeo } from '../../seo/useSeo';
 
 /**
  * Layout raíz: el fondo WebGL vive aquí, montado UNA sola vez, para que
@@ -20,6 +21,10 @@ import { CursorHalo } from './CursorHalo';
 export function Layout() {
   const diagnostic = useDiagnostic();
   const location = useLocation();
+
+  /* Head (title, canonical, OG, JSON-LD) al navegar dentro del SPA: el HTML
+     estático ya trae el correcto en la primera carga. */
+  useSeo();
 
   /* El ecosistema se conecta al entrar, sin importar la ruta inicial. */
   useEffect(() => {

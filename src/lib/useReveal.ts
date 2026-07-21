@@ -26,6 +26,12 @@ export function useReveal(): void {
   }, []);
 }
 
+/**
+ * Se llama durante el render (PageTransition, HeroHome), así que tiene que
+ * sobrevivir al prerender en Node, donde no existe `window`. Sin navegador
+ * asumimos movimiento normal: el cliente vuelve a evaluarlo al hidratar.
+ */
 export function prefersReducedMotion(): boolean {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false;
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }

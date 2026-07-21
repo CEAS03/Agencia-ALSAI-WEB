@@ -154,7 +154,7 @@ export function useDiagnostic() {
   const begin = useCallback(async () => {
     if (!startedTracked.current) {
       startedTracked.current = true;
-      track('diagnostic_started');
+      track('diagnostic_start');
     }
     patch({ busy: true, error: null });
     try {
@@ -203,7 +203,7 @@ export function useDiagnostic() {
         } else {
           // Fin del cuestionario: el motor local calcula el resultado inmediato.
           const result = evaluarDiagnostico(nextAnswers);
-          track('diagnostic_result_shown', { modo: result.impacto.modo });
+          track('diagnostic_complete', { modo: result.impacto.modo });
           setEcoMode('success');
           patch({ phase: 'resultado', step: null, progress: 1, result });
         }
@@ -231,8 +231,9 @@ export function useDiagnostic() {
       patch({ phase: 'submitting', error: null });
       try {
         await adapter.submitLead(lead, state.result ?? undefined);
-        track('lead_form_completed');
-        track('diagnostic_completed');
+        /* Un solo evento por conversión: `diagnostic_complete` ya se emitió
+           al calcular el resultado; aquí lo que ocurre es la captura del lead. */
+        track('generate_lead', { origen: 'diagnostico' });
         setEcoMode('success');
         patch({ phase: 'ready', lead });
       } catch {
@@ -249,7 +250,7 @@ export function useDiagnostic() {
     patch({ meeting: 'requesting' });
     try {
       await adapter.requestMeeting(state.lead);
-      track('meeting_requested');
+      track('schedule_call_click', { origen: 'diagnostico' });
       patch({ meeting: 'done' });
     } catch {
       patch({ meeting: 'idle', error: 'No pudimos registrar la solicitud. Intenta de nuevo.' });

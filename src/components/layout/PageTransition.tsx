@@ -18,8 +18,13 @@ import { prefersReducedMotion } from '../../lib/useReveal';
 
 const INTRO_KEY = 'alsai-intro-v1';
 
-/** true mientras la intro de esta sesión no se haya mostrado. */
+/**
+ * true mientras la intro de esta sesión no se haya mostrado.
+ * Se consulta durante el render, así que devuelve false en el prerender
+ * (sin `window`): el HTML estático nunca describe una intro en curso.
+ */
 export function introPending(): boolean {
+  if (typeof window === 'undefined') return false;
   try {
     return window.sessionStorage.getItem(INTRO_KEY) === null;
   } catch {

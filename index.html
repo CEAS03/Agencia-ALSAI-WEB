@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html lang="es-MX">
   <head>
     <meta charset="UTF-8" />
     <meta
@@ -7,12 +7,28 @@
       content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     />
     <meta name="theme-color" content="#040a16" />
+
+    <!-- Las etiquetas de analítica se cargan desde src/lib/analytics.ts. -->
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!--
+      Titulo, descripcion, canonical, Open Graph y JSON-LD los inyecta
+      scripts/prerender.mjs en cada HTML estatico, a partir de
+      src/seo/seo.config.ts. Los dos de abajo solo sirven en `vite dev`.
+      No escribas aqui las etiquetas literales dentro de un comentario:
+      el prerender las busca por texto y se llevaria el cierre del comentario.
+    -->
+    <title>Agencia de Inteligencia Artificial en Querétaro | ALSAI</title>
     <meta
       name="description"
-      content="Agencia ALSAI — Sistemas completos de crecimiento: marketing, IA, WhatsApp, CRM, agenda y seguimiento conectados para clínicas y negocios de servicios."
+      content="Agencia de inteligencia artificial y automatización en Querétaro. Conectamos marketing, IA, WhatsApp, CRM y seguimiento en un solo sistema de crecimiento."
     />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>Agencia ALSAI — Más clientes, menos caos</title>
   </head>
   <body>
     <div id="root"></div>

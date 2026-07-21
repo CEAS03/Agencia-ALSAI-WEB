@@ -1,62 +1,212 @@
 import { site } from '../config/site';
 
 /**
- * Capa de analítica desacoplada.
- * Los eventos se emiten a todos los "sinks" registrados; ningún sink
- * ausente o sin credenciales produce errores.
+ * ─────────────────────────────────────────────────────────────────────────
+ *  CAPA DE ANALÍTICA Y CONVERSIONES
+ *
+ *  Un solo `track()` alimenta a todos los destinos configurados. Ninguno es
+ *  obligatorio: sin variables de entorno el sitio funciona igual y los
+ *  eventos solo se ven en consola durante el desarrollo.
+ *
+ *  Variables de entorno (ver .env.example):
+ *    VITE_GTM_ID          GTM-XXXXXXX     Google Tag Manager
+ *    VITE_GA4_ID          G-XXXXXXXXXX    GA4 directo (omitir si usas GTM)
+ *    VITE_META_PIXEL_ID   000000000000    Meta Pixel
+ *
+ *  Si defines GTM, NO definas también GA4: se contarían dos veces los mismos
+ *  eventos. Con GTM, GA4 se configura dentro del contenedor.
+ *
+ *  PII: `track()` descarta cualquier propiedad con pinta de dato personal
+ *  (nombre, email, teléfono…). Los eventos describen comportamiento, nunca
+ *  a la persona; los datos del lead viajan solo al webhook de n8n.
+ * ─────────────────────────────────────────────────────────────────────────
  */
 
 export type AnalyticsEvent =
-  | 'landing_view'
+  /* Conversiones principales */
+  | 'primary_cta_click'
+  | 'diagnostic_start'
+  | 'diagnostic_complete'
+  | 'generate_lead'
+  | 'whatsapp_click'
+  | 'schedule_call_click'
+  /* Contexto y micro-conversiones */
   | 'page_view'
   | 'diagnostic_opened'
-  | 'diagnostic_started'
-  | 'diagnostic_result_shown'
   | 'formulas_opened'
   | 'routes_cta_clicked'
-  | 'lead_form_completed'
-  | 'diagnostic_completed'
   | 'contact_save_clicked'
-  | 'meeting_requested'
   | 'website_clicked'
-  | 'social_clicked'
-  | 'blindafon_bot_clicked';
+  | 'social_clicked';
+
+/** Eventos que cuentan como conversión (se marcan para Ads/Meta). */
+const CONVERSIONS: ReadonlySet<AnalyticsEvent> = new Set<AnalyticsEvent>([
+  'diagnostic_complete',
+  'generate_lead',
+  'whatsapp_click',
+  'schedule_call_click',
+]);
 
 type EventProps = Record<string, string | number | boolean | undefined>;
 
 type Sink = (event: AnalyticsEvent, props: EventProps) => void;
 
+const env = import.meta.env as Record<string, string | undefined>;
+
+/** Las variables pegadas en paneles externos arrastran BOM y espacios. */
+function readEnv(key: string): string {
+  return (env[key] ?? '').replace(/^﻿/, '').trim();
+}
+
+const GTM_ID = readEnv('VITE_GTM_ID');
+const GA4_ID = readEnv('VITE_GA4_ID');
+const META_PIXEL_ID = readEnv('VITE_META_PIXEL_ID');
+
+/* ── Higiene de datos ────────────────────────────────────────────────────── */
+
+const PII_KEY = /nombre|name|email|correo|mail|tel|phone|whatsapp|direccion|address|rfc/i;
+
+function sanitize(props: EventProps): EventProps {
+  const clean: EventProps = {};
+  for (const [key, value] of Object.entries(props)) {
+    if (value === undefined) continue;
+    if (PII_KEY.test(key)) continue;
+    /* Un string largo casi siempre es texto libre del usuario. */
+    if (typeof value === 'string' && value.length > 120) continue;
+    clean[key] = value;
+  }
+  return clean;
+}
+
+/* ── Carga de etiquetas externas ─────────────────────────────────────────── */
+
+function injectScript(src: string, id: string): void {
+  if (document.getElementById(id)) return;
+  const el = document.createElement('script');
+  el.id = id;
+  el.async = true;
+  el.src = src;
+  document.head.appendChild(el);
+}
+
+type Gtag = (...args: unknown[]) => void;
+
+interface TagWindow extends Window {
+  dataLayer?: unknown[];
+  gtag?: Gtag;
+  fbq?: ((...args: unknown[]) => void) & { queue?: unknown[]; loaded?: boolean };
+  _fbq?: unknown;
+  _hsq?: unknown[];
+}
+
+function w(): TagWindow {
+  return window as unknown as TagWindow;
+}
+
+let initialized = false;
+
+/**
+ * Carga las etiquetas configuradas. Se llama una sola vez desde main.tsx,
+ * después de que el documento existe y sin bloquear el render: todos los
+ * scripts entran con `async`.
+ */
+export function initAnalytics(): void {
+  if (initialized || typeof window === 'undefined') return;
+  initialized = true;
+
+  const win = w();
+  win.dataLayer = win.dataLayer ?? [];
+
+  if (GTM_ID) {
+    win.dataLayer.push({ 'gtm.start': Date.now(), event: 'gtm.js' });
+    injectScript(`https://www.googletagmanager.com/gtm.js?id=${GTM_ID}`, 'gtm-loader');
+  } else if (GA4_ID) {
+    injectScript(`https://www.googletagmanager.com/gtag/js?id=${GA4_ID}`, 'ga4-loader');
+    const gtag: Gtag = (...args) => {
+      win.dataLayer!.push(args);
+    };
+    win.gtag = gtag;
+    gtag('js', new Date());
+    /* El page_view lo emitimos nosotros en cada cambio de ruta del SPA. */
+    gtag('config', GA4_ID, { send_page_view: false });
+  }
+
+  if (META_PIXEL_ID) {
+    const fbq: TagWindow['fbq'] = Object.assign(
+      (...args: unknown[]) => {
+        const q = fbq!.queue ?? (fbq!.queue = []);
+        q.push(args);
+      },
+      { queue: [] as unknown[], loaded: true },
+    );
+    win.fbq = win.fbq ?? fbq;
+    win._fbq = win._fbq ?? win.fbq;
+    injectScript('https://connect.facebook.net/en_US/fbevents.js', 'meta-pixel-loader');
+    win.fbq('init', META_PIXEL_ID);
+    win.fbq('track', 'PageView');
+  }
+}
+
+/* ── Destinos ────────────────────────────────────────────────────────────── */
+
 const sinks: Sink[] = [];
 
-/* Sink de consola (solo con VITE_ANALYTICS_DEBUG o en dev) */
+/* Consola: solo en desarrollo o con VITE_ANALYTICS_DEBUG=true. */
 if (site.integrations.analyticsDebug) {
   sinks.push((event, props) => {
     console.info(`[analytics] ${event}`, props);
   });
 }
 
-/* Sink dataLayer (GTM), si existe en la página */
+/* dataLayer — lo consumen GTM y GA4. Único punto de entrada para ambos. */
 sinks.push((event, props) => {
-  const dl = (window as unknown as { dataLayer?: unknown[] }).dataLayer;
+  const dl = w().dataLayer;
   if (Array.isArray(dl)) dl.push({ event, ...props });
+});
+
+/* GA4 directo, solo cuando no hay GTM (si hubiera, sería doble conteo). */
+sinks.push((event, props) => {
+  if (GTM_ID || !GA4_ID) return;
+  w().gtag?.('event', event, props);
+});
+
+/* Meta Pixel: los eventos estándar se mapean; el resto va como personalizado. */
+const META_STANDARD: Partial<Record<AnalyticsEvent, string>> = {
+  generate_lead: 'Lead',
+  diagnostic_start: 'InitiateCheckout',
+  diagnostic_complete: 'CompleteRegistration',
+  schedule_call_click: 'Schedule',
+  whatsapp_click: 'Contact',
+};
+
+sinks.push((event, props) => {
+  const fbq = w().fbq;
+  if (!META_PIXEL_ID || !fbq) return;
+  const standard = META_STANDARD[event];
+  if (standard) fbq('track', standard, props);
+  else fbq('trackCustom', event, props);
 });
 
 /**
  * Adaptador HubSpot — preparado, inactivo sin credenciales.
- * Cuando exista el portal: cargar el script de tracking de HubSpot en
- * index.html (o vía loader) y este sink empujará los eventos a _hsq.
- * Ver README.md § Integraciones.
+ * Cuando exista el portal: cargar el script de tracking de HubSpot y este
+ * sink empujará los eventos a _hsq. Ver README.md § Integraciones.
  */
 sinks.push((event, props) => {
   if (!site.integrations.hubspot.portalId) return;
-  const hsq = ((window as unknown as { _hsq?: unknown[] })._hsq ??= []);
+  const hsq = (w()._hsq ??= []);
   hsq.push(['trackCustomBehavioralEvent', { name: event, properties: props }]);
 });
 
+/* ── API pública ─────────────────────────────────────────────────────────── */
+
 export function track(event: AnalyticsEvent, props: EventProps = {}): void {
+  const payload = sanitize(props);
+  if (CONVERSIONS.has(event)) payload.conversion = true;
+
   for (const sink of sinks) {
     try {
-      sink(event, props);
+      sink(event, payload);
     } catch {
       /* la analítica jamás rompe la experiencia */
     }

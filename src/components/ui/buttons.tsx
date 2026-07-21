@@ -1,5 +1,6 @@
 import { useContext, useRef, createContext, type ReactNode } from 'react';
 import { useMagnetic } from '../../lib/motion';
+import { track } from '../../lib/analytics';
 import { IconPulse } from '../icons';
 
 /**
@@ -48,11 +49,30 @@ export function PrimaryCta({ children, onPress, fx = true }: PrimaryCtaProps) {
   );
 }
 
-/** CTA que abre el diagnóstico desde cualquier página. */
-export function DiagCta({ children = 'Iniciar diagnóstico', fx }: { children?: ReactNode; fx?: boolean }) {
+/**
+ * CTA que abre el diagnóstico desde cualquier página.
+ * Es el punto único donde se mide `primary_cta_click`: la conversión
+ * principal del sitio y la que reciben los anuncios. `origen` permite
+ * distinguir qué sección la generó sin duplicar el evento.
+ */
+export function DiagCta({
+  children = 'Iniciar diagnóstico',
+  fx,
+  origen,
+}: {
+  children?: ReactNode;
+  fx?: boolean;
+  origen?: string;
+}) {
   const open = useOpenDiagnostic();
+
+  const onPress = (rect: DOMRect | null) => {
+    track('primary_cta_click', { origen });
+    open(rect);
+  };
+
   return (
-    <PrimaryCta onPress={open} fx={fx}>
+    <PrimaryCta onPress={onPress} fx={fx}>
       {children}
     </PrimaryCta>
   );

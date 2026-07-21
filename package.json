@@ -6,7 +6,9 @@
   "description": "Sitio web oficial de Agencia ALSAI — multipágina premium con ecosistema WebGL persistente, sistema de movimiento GSAP y diagnóstico integrado",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && vite build --ssr src/entry-server.tsx --outDir dist-ssr && node scripts/prerender.mjs",
+    "build:client": "vite build",
+    "gen:assets": "node scripts/gen-assets.mjs",
     "preview": "vite preview",
     "test": "node --test src/diagnostic/engine/scoring.test.ts"
   },

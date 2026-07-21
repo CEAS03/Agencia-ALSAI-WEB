@@ -1,11 +1,46 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "rewrites": [{ "source": "/((?!assets/|favicon.svg|aviso-privacidad.html).*)", "destination": "/index.html" }],
+
+  "//": "Cada ruta se publica como HTML estático propio (scripts/prerender.mjs), así que ya NO hay reescritura comodín al index: era ella la que hacía que /robots.txt y /sitemap.xml respondieran HTML con status 200, y que cualquier URL inexistente devolviera 200 en vez de 404.",
+
+  "cleanUrls": true,
+  "trailingSlash": false,
+
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "alsai-sitio-web.vercel.app" }],
+      "destination": "https://www.agencia-alsai.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/aviso-privacidad.html",
+      "destination": "/aviso-de-privacidad",
+      "permanent": true
+    }
+  ],
+
   "headers": [
     {
       "source": "/assets/(.*)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
+      "source": "/og/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800" }]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains; preload"
+        }
       ]
     }
   ]

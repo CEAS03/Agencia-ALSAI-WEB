@@ -1,101 +1,55 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useMemo, type ComponentType } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { Layout } from './components/layout/Layout';
-import HomePage from './pages/HomePage';
+import { routeDefs } from './routes';
 
-/* Rutas secundarias con code-splitting: la Home carga primero y rápido. */
-const ClinicasPage = lazy(() => import('./pages/ClinicasPage'));
-const DiagnosticoPage = lazy(() => import('./pages/DiagnosticoPage'));
-const SolucionesPage = lazy(() => import('./pages/SolucionesPage'));
-const CasosPage = lazy(() => import('./pages/CasosPage'));
-const CasoBlindafonPage = lazy(() => import('./pages/CasoBlindafonPage'));
-const CasoInmobiliariaPage = lazy(() => import('./pages/CasoInmobiliariaPage'));
-const NosotrosPage = lazy(() => import('./pages/NosotrosPage'));
-const AvisoPrivacidadPage = lazy(() => import('./pages/AvisoPrivacidadPage'));
-const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
+/**
+ * Rutas del sitio a partir de la tabla compartida `routeDefs`.
+ * La Home viaja en el chunk principal; el resto usa code-splitting.
+ *
+ * `resolved` permite al prerender inyectar los componentes ya cargados
+ * (renderToString no espera a React.lazy y dejaría el HTML vacío).
+ */
+export default function App({
+  resolved,
+}: {
+  resolved?: Map<string, ComponentType>;
+} = {}) {
+  const routes = useMemo(
+    () =>
+      routeDefs.map((def) => {
+        const key = def.index ? 'index' : (def.path as string);
+        const Eager = def.Component ?? resolved?.get(key);
+        const element = Eager ? (
+          <Eager />
+        ) : (
+          <Suspense fallback={null}>{createLazy(key, def.load!)}</Suspense>
+        );
 
-function Deferred({ children }: { children: React.ReactNode }) {
-  return <Suspense fallback={null}>{children}</Suspense>;
-}
+        return def.index ? (
+          <Route key={key} index element={element} />
+        ) : (
+          <Route key={key} path={def.path} element={element} />
+        );
+      }),
+    [resolved],
+  );
 
-export default function App() {
   return (
     <Routes>
-      <Route element={<Layout />}>
-        <Route index element={<HomePage />} />
-        <Route
-          path="clinicas"
-          element={
-            <Deferred>
-              <ClinicasPage />
-            </Deferred>
-          }
-        />
-        <Route
-          path="diagnostico"
-          element={
-            <Deferred>
-              <DiagnosticoPage />
-            </Deferred>
-          }
-        />
-        <Route
-          path="soluciones"
-          element={
-            <Deferred>
-              <SolucionesPage />
-            </Deferred>
-          }
-        />
-        <Route
-          path="casos"
-          element={
-            <Deferred>
-              <CasosPage />
-            </Deferred>
-          }
-        />
-        <Route
-          path="casos/blindafon"
-          element={
-            <Deferred>
-              <CasoBlindafonPage />
-            </Deferred>
-          }
-        />
-        <Route
-          path="casos/inmobiliaria"
-          element={
-            <Deferred>
-              <CasoInmobiliariaPage />
-            </Deferred>
-          }
-        />
-        <Route
-          path="nosotros"
-          element={
-            <Deferred>
-              <NosotrosPage />
-            </Deferred>
-          }
-        />
-        <Route
-          path="aviso-de-privacidad"
-          element={
-            <Deferred>
-              <AvisoPrivacidadPage />
-            </Deferred>
-          }
-        />
-        <Route
-          path="*"
-          element={
-            <Deferred>
-              <NotFoundPage />
-            </Deferred>
-          }
-        />
-      </Route>
+      <Route element={<Layout />}>{routes}</Route>
     </Routes>
   );
+}
+
+/* React.lazy debe crearse una sola vez por ruta, no en cada render. */
+const lazyCache = new Map<string, ComponentType>();
+
+function createLazy(key: string, load: () => Promise<{ default: ComponentType }>) {
+  let Comp = lazyCache.get(key);
+  if (!Comp) {
+    Comp = lazy(load);
+    lazyCache.set(key, Comp);
+  }
+  return <Comp />;
 }

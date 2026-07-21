@@ -18,7 +18,14 @@ export function FounderCard() {
       <div className="founder-card reveal">
         <div className="founder-photo" aria-hidden={founder.photoSrc ? undefined : true}>
           {founder.photoSrc ? (
-            <img src={founder.photoSrc} alt={founder.name} />
+            <img
+              src={founder.photoSrc}
+              alt={`${founder.name}, ${founder.role}`}
+              width={220}
+              height={220}
+              loading="lazy"
+              decoding="async"
+            />
           ) : (
             <span className="founder-monogram">{initials}</span>
           )}

@@ -19,7 +19,9 @@ export function SiteFooter() {
 
   const openExternal = (key: 'whatsapp' | 'instagram' | 'linkedin') => {
     const url = site.links[key];
-    track('social_clicked', { channel: key });
+    /* WhatsApp es conversión, no una red social más. */
+    if (key === 'whatsapp') track('whatsapp_click', { origen: 'footer' });
+    else track('social_clicked', { channel: key });
     if (!url) {
       toast('Este enlace estará disponible muy pronto');
       return;

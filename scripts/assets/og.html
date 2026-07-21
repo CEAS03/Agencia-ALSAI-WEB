@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="es-MX">
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      /* Plantilla de la imagen social (1200 × 630). La rasteriza
+         scripts/gen-assets.mjs con Chrome en modo headless.
+         Editar aquí y volver a ejecutar `npm run gen:assets`. */
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+
+      html, body {
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+      }
+
+      body {
+        position: relative;
+        background: #040a16;
+        color: #eaf2ff;
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        /* El relleno inferior extra reserva la banda del pie: así el bloque
+           centrado nunca se pega a "Querétaro, México". */
+        padding: 70px 88px 150px;
+      }
+
+      /* Halos del ecosistema, en los mismos azules de la marca. */
+      .glow {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(90px);
+        pointer-events: none;
+      }
+      .glow-a { width: 620px; height: 620px; right: -160px; top: -220px; background: rgba(77, 157, 255, 0.28); }
+      .glow-b { width: 520px; height: 520px; left: -190px; bottom: -240px; background: rgba(55, 226, 228, 0.18); }
+
+      .grid {
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(120, 170, 255, 0.055) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(120, 170, 255, 0.055) 1px, transparent 1px);
+        background-size: 60px 60px;
+        mask-image: radial-gradient(circle at 30% 45%, #000 0%, transparent 78%);
+      }
+
+      .content { position: relative; z-index: 2; }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 40px;
+      }
+      .brand svg { width: 58px; height: 58px; }
+      .wordmark {
+        font-size: 30px;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+      .wordmark .ai {
+        background: linear-gradient(94deg, #4d9dff, #37e2e4);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .overline {
+        display: block;
+        font-size: 13px;
+        font-weight: 500;
+        letter-spacing: 0.34em;
+        color: #7f95bb;
+        margin-bottom: 3px;
+      }
+
+      h1 {
+        font-size: 62px;
+        line-height: 1.09;
+        font-weight: 700;
+        letter-spacing: -0.022em;
+        max-width: 15.5ch;
+      }
+      h1 .hl {
+        background: linear-gradient(94deg, #4d9dff, #37e2e4);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      p.sub {
+        margin-top: 30px;
+        font-size: 25px;
+        line-height: 1.42;
+        color: #a8bcdd;
+        max-width: 27ch;
+      }
+
+      .foot {
+        position: absolute;
+        left: 88px;
+        right: 88px;
+        bottom: 60px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        font-size: 19px;
+        color: #7f95bb;
+        letter-spacing: 0.03em;
+      }
+      .dot { width: 7px; height: 7px; border-radius: 50%; background: #37e2e4; }
+      .rule {
+        flex: 1;
+        height: 1px;
+        background: linear-gradient(90deg, rgba(127, 149, 187, 0.42), transparent);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="glow glow-a"></div>
+    <div class="glow glow-b"></div>
+    <div class="grid"></div>
+
+    <div class="content">
+      <div class="brand">
+        <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+          <rect width="64" height="64" rx="16" fill="#0b1426" />
+          <circle cx="20" cy="40" r="5" fill="none" stroke="#4d9dff" stroke-width="2.5" />
+          <circle cx="44" cy="22" r="5" fill="none" stroke="#37e2e4" stroke-width="2.5" />
+          <path d="M24 36.5 40 25.5" stroke="url(#g)" stroke-width="2.5" stroke-linecap="round" />
+          <circle cx="32" cy="31" r="2.4" fill="#eaf2ff" />
+          <defs>
+            <linearGradient id="g" x1="24" y1="36" x2="40" y2="26" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#4d9dff" />
+              <stop offset="1" stop-color="#37e2e4" />
+            </linearGradient>
+          </defs>
+        </svg>
+        <span class="wordmark">
+          <span class="overline">Agencia</span>
+          ALS<span class="ai">AI</span>
+        </span>
+      </div>
+
+      <h1>Inteligencia artificial que <span class="hl">hace el trabajo pesado</span>.</h1>
+
+      <p class="sub">
+        Marketing, IA, WhatsApp, CRM y seguimiento conectados en un solo sistema.
+      </p>
+    </div>
+
+    <div class="foot">
+      <span class="dot"></span>
+      <span>Querétaro, México</span>
+      <span class="rule"></span>
+      <span>agencia-alsai.com</span>
+    </div>
+  </body>
+</html>
