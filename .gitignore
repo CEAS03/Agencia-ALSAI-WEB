@@ -1,0 +1,12 @@
+node_modules
+dist
+.env
+.env.local
+*.local
+.DS_Store
+
+.vercel
+.env*
+
+# Artefactos de compilación de TypeScript
+*.tsbuildinfo

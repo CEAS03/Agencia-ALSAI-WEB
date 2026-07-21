@@ -1,0 +1,374 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   DEMO "conversación visible / sistema detrás" — Home y Clínicas
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.dm {
+  margin-top: clamp(40px, 6vh, 64px);
+  display: grid;
+  grid-template-columns: minmax(320px, 430px) 1fr;
+  gap: clamp(24px, 4vw, 56px);
+  align-items: start;
+}
+
+/* ── Teléfono ───────────────────────────────────────────────────────── */
+
+.dm-phone {
+  position: relative;
+  border-radius: 30px;
+  border: 1px solid var(--line-strong);
+  background: linear-gradient(165deg, rgba(10, 20, 42, 0.9), rgba(5, 11, 24, 0.94));
+  box-shadow:
+    0 30px 80px rgba(2, 6, 16, 0.6),
+    inset 0 1px 0 rgba(160, 195, 255, 0.12);
+  padding: 14px;
+}
+
+.dm-phead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.dm-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(30, 56, 104, 0.6);
+  color: var(--ink-dim);
+}
+
+.dm-avatar svg {
+  width: 21px;
+  height: 21px;
+}
+
+.dm-pname {
+  font-family: var(--font-display);
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+.dm-psub {
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--ink-faint);
+}
+
+.dm-live {
+  margin-left: auto;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 10px rgba(46, 230, 195, 0.8);
+  animation: signal-breathe 2.8s var(--ease-in-out) infinite;
+}
+
+.dm-chat {
+  height: clamp(320px, 44vh, 420px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 8px 12px;
+}
+
+.dm-chat::-webkit-scrollbar {
+  display: none;
+}
+
+.dm-bubble {
+  position: relative;
+  max-width: 82%;
+  padding: 10px 14px 20px;
+  border-radius: 16px;
+  font-size: 13.8px;
+  line-height: 1.45;
+  animation: dm-pop 420ms var(--ease-out) both;
+}
+
+.dm-bubble p + p {
+  margin-top: 7px;
+}
+
+@keyframes dm-pop {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.dm-in {
+  align-self: flex-start;
+  background: rgba(16, 30, 60, 0.85);
+  border: 1px solid var(--line);
+  border-bottom-left-radius: 6px;
+}
+
+.dm-out {
+  align-self: flex-end;
+  background: linear-gradient(140deg, rgba(20, 68, 66, 0.85), rgba(12, 44, 46, 0.9));
+  border: 1px solid rgba(55, 226, 228, 0.18);
+  border-bottom-right-radius: 6px;
+}
+
+.dm-time {
+  position: absolute;
+  right: 12px;
+  bottom: 6px;
+  font-size: 10px;
+  color: var(--ink-faint);
+}
+
+.dm-empty {
+  margin: auto;
+  font-size: 13px;
+  color: var(--ink-faint);
+  text-align: center;
+}
+
+.dm-flash {
+  position: absolute;
+  top: -13px;
+  right: 18px;
+  padding: 5px 13px;
+  border-radius: var(--r-pill);
+  background: rgba(46, 230, 195, 0.12);
+  border: 1px solid rgba(46, 230, 195, 0.35);
+  font-family: var(--font-display);
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: var(--success);
+  animation: dm-pop 420ms var(--ease-out) both;
+}
+
+/* ── Sistema detrás ─────────────────────────────────────────────────── */
+
+.dm-sys-title {
+  letter-spacing: 0.28em;
+}
+
+.dm-events {
+  position: relative;
+  margin-top: 20px;
+  min-height: clamp(300px, 40vh, 400px);
+  max-height: clamp(320px, 44vh, 430px);
+  overflow-y: auto;
+  scrollbar-width: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-left: 26px;
+}
+
+.dm-events::-webkit-scrollbar {
+  display: none;
+}
+
+.dm-rail {
+  position: absolute;
+  left: 8px;
+  top: 6px;
+  bottom: 6px;
+  width: 1px;
+  background: linear-gradient(180deg, var(--line-strong), var(--line) 80%, transparent);
+}
+
+.dm-event {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  padding: 13px 16px;
+  border-radius: 15px;
+  border: 1px solid var(--line);
+  background: rgba(8, 16, 34, 0.6);
+  animation: dm-pop 460ms var(--ease-out) both;
+  transition: border-color 400ms ease, box-shadow 400ms ease;
+}
+
+/* Conector hacia el riel */
+.dm-event::before {
+  content: '';
+  position: absolute;
+  left: -18px;
+  top: 22px;
+  width: 12px;
+  height: 1px;
+  background: var(--line-strong);
+}
+
+.dm-event::after {
+  content: '';
+  position: absolute;
+  left: -21px;
+  top: 19.5px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--electric);
+  box-shadow: 0 0 8px rgba(77, 157, 255, 0.7);
+}
+
+.dm-event.is-latest {
+  border-color: rgba(122, 172, 255, 0.45);
+  box-shadow: 0 10px 34px rgba(20, 48, 110, 0.35);
+}
+
+.dm-ev-icon {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: rgba(30, 56, 104, 0.45);
+  color: var(--electric);
+}
+
+.dm-ev-icon svg {
+  width: 19px;
+  height: 19px;
+}
+
+.dm-k-data .dm-ev-icon {
+  color: var(--violet);
+  background: rgba(139, 124, 246, 0.14);
+}
+
+.dm-k-agenda .dm-ev-icon {
+  color: var(--cyan);
+  background: rgba(55, 226, 228, 0.1);
+}
+
+.dm-k-follow .dm-ev-icon,
+.dm-k-dash .dm-ev-icon {
+  color: var(--success);
+  background: rgba(46, 230, 195, 0.1);
+}
+
+.dm-k-data .dm-event::after {
+  background: var(--violet);
+}
+
+.dm-ev-sys {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.dm-ev-detail {
+  margin-top: 3px;
+  font-size: 14px;
+  color: var(--ink);
+}
+
+/* ── Controles ──────────────────────────────────────────────────────── */
+
+.dm-controls {
+  margin-top: 22px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dm-controls button {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--line-strong);
+  background: rgba(9, 18, 38, 0.6);
+  color: var(--ink-dim);
+  display: grid;
+  place-items: center;
+  transition:
+    transform var(--dur-press) var(--ease-out),
+    border-color var(--dur-quick) ease,
+    color var(--dur-quick) ease;
+}
+
+.dm-controls button svg {
+  width: 17px;
+  height: 17px;
+}
+
+.dm-controls button:active {
+  transform: scale(0.92);
+}
+
+.dm-controls button:disabled {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .dm-controls button:hover {
+    border-color: rgba(122, 172, 255, 0.6);
+    color: var(--ink);
+  }
+}
+
+.dm-controls .dm-play {
+  width: 52px;
+  height: 52px;
+  color: var(--cyan);
+  border-color: rgba(55, 226, 228, 0.4);
+  background: rgba(55, 226, 228, 0.07);
+}
+
+.dm-count {
+  margin-left: 6px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  color: var(--ink-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.dm-note {
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--ink-faint);
+}
+
+/* ── Móvil: apilado, conversación arriba ────────────────────────────── */
+
+@media (max-width: 860px) {
+  .dm {
+    grid-template-columns: 1fr;
+  }
+
+  .dm-phone {
+    max-width: 460px;
+  }
+
+  .dm-chat {
+    height: clamp(280px, 40vh, 360px);
+  }
+
+  .dm-events {
+    min-height: 0;
+    max-height: 340px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dm-bubble,
+  .dm-event,
+  .dm-flash {
+    animation: none;
+  }
+}

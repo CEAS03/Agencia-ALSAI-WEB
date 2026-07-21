@@ -1,0 +1,46 @@
+/* ── Tokens de diseño ALSAI ─────────────────────────────────────────── */
+:root {
+  color-scheme: dark;
+
+  /* Color */
+  --bg: #040a16;
+  --bg-deep: #030812;
+  --bg-raise: #081226;
+  --ink: #eaf2ff;
+  --ink-dim: #8fa3c4;
+  --ink-faint: #5b6f93;
+  --electric: #4d9dff;
+  --cyan: #37e2e4;
+  --violet: #8b7cf6;
+  --success: #2ee6c3;
+  --danger: #ff7d8a;
+  --line: rgba(126, 166, 224, 0.15);
+  --line-strong: rgba(126, 166, 224, 0.28);
+  --glass: rgba(10, 19, 40, 0.55);
+  --glass-strong: rgba(6, 13, 28, 0.86);
+
+  /* Tipografía */
+  --font-display: 'Space Grotesk Variable', 'Space Grotesk', system-ui, sans-serif;
+  --font-body: 'Outfit Variable', 'Outfit', system-ui, sans-serif;
+
+  /* Movimiento — un solo lenguaje para toda la experiencia */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-panel: cubic-bezier(0.32, 0.72, 0, 1);
+  --dur-press: 140ms;
+  --dur-quick: 180ms;
+  --dur-reveal: 520ms;
+  --dur-panel: 480ms;
+
+  /* Espacio */
+  --pad-x: clamp(22px, 6vw, 34px);
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --content-max: 720px;
+
+  /* Radio */
+  --r-chip: 12px;
+  --r-card: 20px;
+  --r-cta: 22px;
+  --r-pill: 999px;
+}

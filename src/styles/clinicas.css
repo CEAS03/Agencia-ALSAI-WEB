@@ -1,0 +1,329 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   CLÍNICAS — estilos de la página sectorial (hereda tokens + site.css)
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Hero ───────────────────────────────────────────────────────────── */
+
+.cl-hero {
+  min-height: 86dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-top: calc(var(--nav-h) + 30px);
+}
+
+.cl-hero .h-display {
+  max-width: 17ch;
+  margin-top: 22px;
+}
+
+.cl-hero .t-lead {
+  margin-top: 24px;
+}
+
+.cl-hero .cta-primary {
+  margin-top: 36px;
+}
+
+/* ── Mapa de fugas ──────────────────────────────────────────────────── */
+
+.fugas-grid {
+  margin-top: clamp(40px, 6vh, 64px);
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.fuga {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  padding: 18px 20px;
+  border-radius: 15px;
+  border: 1px solid var(--line);
+  background: rgba(8, 16, 34, 0.55);
+  transition: border-color var(--dur-quick) ease, transform var(--dur-quick) var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .fuga:hover {
+    border-color: rgba(255, 125, 138, 0.35);
+    transform: translateY(-3px);
+  }
+}
+
+.fuga-drip {
+  position: relative;
+  flex: 0 0 auto;
+  width: 22px;
+  height: 34px;
+  margin-top: 2px;
+}
+
+.fuga-drip::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 9px;
+  height: 9px;
+  margin-left: -4.5px;
+  border-radius: 50%;
+  border: 1.5px solid var(--danger);
+  opacity: 0.8;
+}
+
+/* La gota que se fuga: cae y se desvanece, en bucle */
+.fuga-drip::after {
+  content: '';
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  margin-left: -2.5px;
+  border-radius: 50%;
+  background: var(--danger);
+  animation: fuga-drop 2.6s var(--ease-in-out) infinite;
+  animation-delay: var(--drip-delay, 0s);
+}
+
+@keyframes fuga-drop {
+  0%,
+  18% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  32% {
+    opacity: 0.9;
+  }
+  70% {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+}
+
+.fuga p {
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--ink-dim);
+}
+
+.fuga strong {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+
+/* ── Recorrido del paciente ─────────────────────────────────────────── */
+
+.rec-list {
+  position: relative;
+  margin-top: clamp(40px, 6vh, 64px);
+  padding-left: 30px;
+  display: flex;
+  flex-direction: column;
+}
+
+.rec-line {
+  position: absolute;
+  left: 8px;
+  top: 10px;
+  bottom: 10px;
+  width: 1.6px;
+  background: linear-gradient(180deg, var(--electric), var(--cyan) 60%, var(--success));
+  opacity: 0.5;
+  transform-origin: top center;
+}
+
+.rec-step {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px 16px;
+  padding-block: 15px;
+}
+
+.rec-step::before {
+  content: '';
+  position: absolute;
+  left: -26.5px;
+  top: 22px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1.6px solid var(--electric);
+  background: var(--bg);
+  box-shadow: 0 0 10px rgba(77, 157, 255, 0.45);
+}
+
+.rec-name {
+  font-family: var(--font-display);
+  font-size: clamp(17px, 2vw, 20px);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.rec-note {
+  flex-basis: 100%;
+  font-size: 13.5px;
+  color: var(--ink-dim);
+  max-width: 56ch;
+}
+
+.rec-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 11px;
+  border-radius: var(--r-pill);
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.rec-chip--tech {
+  color: var(--cyan);
+  border: 1px solid rgba(55, 226, 228, 0.35);
+  background: rgba(55, 226, 228, 0.07);
+}
+
+.rec-chip--human {
+  color: var(--ink);
+  border: 1px solid var(--line-strong);
+  background: rgba(9, 18, 38, 0.6);
+}
+
+.rec-chip--both {
+  color: var(--violet);
+  border: 1px solid rgba(139, 124, 246, 0.4);
+  background: rgba(139, 124, 246, 0.08);
+}
+
+.rec-legend {
+  margin-top: 26px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* ── Implementación por fases ───────────────────────────────────────── */
+
+.impl-grid {
+  margin-top: clamp(36px, 5vh, 56px);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  counter-reset: impl;
+}
+
+.impl-step {
+  position: relative;
+  padding: 24px;
+  border-radius: var(--r-card);
+  border: 1px solid var(--line);
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.impl-step::before {
+  counter-increment: impl;
+  content: 'Fase 0' counter(impl);
+  font-family: var(--font-display);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cyan);
+}
+
+.impl-step h3 {
+  margin-top: 12px;
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.impl-step p {
+  margin-top: 9px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-dim);
+}
+
+/* ── Privacidad y control humano ────────────────────────────────────── */
+
+.priv-card {
+  margin-top: clamp(36px, 5vh, 56px);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: clamp(20px, 3vw, 36px);
+  padding: clamp(26px, 4vw, 44px);
+  border-radius: calc(var(--r-card) + 4px);
+  border: 1px solid var(--line-strong);
+  background:
+    radial-gradient(70% 120% at 0% 0%, rgba(46, 230, 195, 0.06), transparent 55%),
+    var(--glass);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.priv-shield {
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  background: rgba(46, 230, 195, 0.09);
+  color: var(--success);
+}
+
+.priv-shield svg {
+  width: 27px;
+  height: 27px;
+}
+
+.priv-card h3 {
+  font-family: var(--font-display);
+  font-size: clamp(19px, 2.2vw, 24px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.priv-card p {
+  margin-top: 12px;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--ink-dim);
+  max-width: 68ch;
+}
+
+.priv-card p strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────── */
+
+@media (max-width: 860px) {
+  .fugas-grid,
+  .impl-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .priv-card {
+    grid-template-columns: 1fr;
+  }
+}

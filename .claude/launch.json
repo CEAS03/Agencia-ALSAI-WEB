@@ -1,0 +1,13 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "alsai-sitio-web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "C:\\Users\\CEAS0\\Documents\\Claude Code VSC\\Agencia ALSAI\\Sitio Web ALSAI Claude",
+      "port": 5188,
+      "autoPort": true
+    }
+  ]
+}
