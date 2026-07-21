@@ -57,8 +57,14 @@ export const site = {
   } satisfies SiteLinks as SiteLinks,
 
   integrations: {
-    /** Webhook de n8n para el diagnóstico. Vacío = modo demo con guion local. */
-    n8nWebhookUrl: (import.meta.env.VITE_N8N_WEBHOOK_URL as string | undefined) ?? '',
+    /**
+     * Webhook de n8n para el diagnóstico. Vacío = modo demo con guion local.
+     * Se limpia de espacios y BOM: pegar la URL en el panel de Vercel puede
+     * arrastrar un ﻿ invisible que convertiría la URL en ruta relativa.
+     */
+    n8nWebhookUrl: ((import.meta.env.VITE_N8N_WEBHOOK_URL as string | undefined) ?? '')
+      .replace(/^﻿/, '')
+      .trim(),
     hubspot: {
       portalId: (import.meta.env.VITE_HUBSPOT_PORTAL_ID as string | undefined) ?? '',
     },
