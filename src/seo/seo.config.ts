@@ -200,6 +200,11 @@ export function getRouteSeo(pathname: string): RouteSeo {
 
 /* ── JSON-LD ─────────────────────────────────────────────────────────────── */
 
+/** Perfiles oficiales, para `sameAs`. Solo los que existen de verdad: un
+ *  `sameAs` a un perfil vacío o ajeno le dice a Google que ese perfil te
+ *  representa, y eso es peor que no declarar ninguno. */
+const SOCIAL_PROFILES = [site.links.instagram, site.links.linkedin].filter(Boolean);
+
 const ORG_ID = `${SITE_URL}/#organizacion`;
 const WEBSITE_ID = `${SITE_URL}/#sitio`;
 const FOUNDER_ID = `${SITE_URL}/nosotros#carlos-alvarez`;
@@ -241,12 +246,25 @@ function organizationNode() {
           },
         }
       : {}),
+    /* ALSAI no tiene local físico: se declara la ciudad y el CP, nunca una
+       calle. Junto con `areaServed` esto describe un negocio que atiende una
+       zona, no un lugar al que se pueda ir. */
     address: {
       '@type': 'PostalAddress',
-      addressLocality: 'Querétaro',
+      addressLocality: 'Santiago de Querétaro',
       addressRegion: 'Querétaro',
+      postalCode: '76060',
       addressCountry: 'MX',
     },
+    /* Horario de atención, no de un mostrador. SUPUESTO: de lunes a viernes;
+       Carlos dio la franja (08:00–20:00) sin especificar días. */
+    openingHoursSpecification: {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+      opens: '08:00',
+      closes: '20:00',
+    },
+    ...(SOCIAL_PROFILES.length ? { sameAs: SOCIAL_PROFILES } : {}),
     areaServed: [
       { '@type': 'City', name: 'Querétaro' },
       { '@type': 'Country', name: 'México' },

@@ -54,7 +54,9 @@ export const site = {
 
   links: {
     website: 'https://www.agencia-alsai.com/',
-    instagram: '',
+    /* Sin los `utm_*` que Instagram añade al copiar desde su botón de
+       compartir: son de esa sesión y no pintan nada en un enlace público. */
+    instagram: 'https://www.instagram.com/agencia.alsai/',
     linkedin: '',
     /** El `text=` precarga el mensaje y sirve para atribuir de dónde viene el lead. */
     whatsapp:
