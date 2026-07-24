@@ -162,9 +162,17 @@
 .dm-events {
   position: relative;
   margin-top: 20px;
-  min-height: clamp(300px, 40vh, 400px);
-  max-height: clamp(320px, 44vh, 430px);
+}
+
+/* Altura fija (la misma que `.dm-chat`, para que las dos columnas casen): la
+   bitácora se desplaza sola hacia el último evento en vez de empujar la página
+   cada vez que el agente hace algo. El padding va aquí dentro: `overflow-y`
+   recorta también en horizontal y sin él se comerían los puntos y conectores
+   que sobresalen hacia el riel. */
+.dm-events-scroll {
+  height: clamp(320px, 44vh, 420px);
   overflow-y: auto;
+  overscroll-behavior: contain;
   scrollbar-width: none;
   display: flex;
   flex-direction: column;
@@ -172,7 +180,7 @@
   padding-left: 26px;
 }
 
-.dm-events::-webkit-scrollbar {
+.dm-events-scroll::-webkit-scrollbar {
   display: none;
 }
 
@@ -359,9 +367,8 @@
     height: clamp(280px, 40vh, 360px);
   }
 
-  .dm-events {
-    min-height: 0;
-    max-height: 340px;
+  .dm-events-scroll {
+    height: 340px;
   }
 }
 
@@ -370,5 +377,12 @@
   .dm-event,
   .dm-flash {
     animation: none;
+  }
+
+  /* Sin autoavance no hay nada que perseguir: se muestra todo de una vez. */
+  .dm-chat,
+  .dm-events-scroll {
+    height: auto;
+    max-height: none;
   }
 }

@@ -122,6 +122,12 @@ Esto no vive en el repositorio y hay que hacerlo a mano:
    `schedule_call_click`.
 3. **Meta Pixel** — si se van a usar campañas de Meta, crear el pixel y añadir
    `VITE_META_PIXEL_ID`.
-4. **Datos que faltan en `src/config/site.ts`** — URLs de WhatsApp, Instagram
-   y LinkedIn, y foto de Carlos. Cuando existan, los perfiles sociales pueden
-   entrar como `sameAs` en el JSON-LD.
+4. **Datos que faltan en `src/config/site.ts`** — solo quedan las URLs de
+   **Instagram y LinkedIn**; esos dos botones del pie siguen avisando "muy
+   pronto". Cuando existan, entran también como `sameAs` en el JSON-LD.
+   Ya cableados (2026-07-23): teléfono, correo, enlace de WhatsApp y foto de
+   Carlos. El teléfono y el correo alimentan la vCard y el nodo
+   `Organization` (`telephone`, `email`, `contactPoint`); la foto alimenta
+   `Person.image`.
+5. **Dirección con calle y CP, y horarios de atención** — faltan para
+   completar `PostalAddress` y `openingHours` del negocio local.

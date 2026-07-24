@@ -13,6 +13,8 @@
  * ─────────────────────────────────────────────────────────────────────────
  */
 
+import { site } from '../config/site';
+
 export const SITE_URL = 'https://www.agencia-alsai.com';
 export const SITE_NAME = 'Agencia ALSAI';
 export const SITE_LOCALE = 'es_MX';
@@ -204,8 +206,9 @@ const FOUNDER_ID = `${SITE_URL}/nosotros#carlos-alvarez`;
 
 /**
  * Organización + servicio profesional en un solo nodo.
- * Sin `address.streetAddress`, `telephone`, `sameAs`, `aggregateRating` ni
- * `priceRange`: no hay dato público verificable para ninguno todavía.
+ * Sin `address.streetAddress`, `sameAs`, `openingHours`, `aggregateRating` ni
+ * `priceRange`: no hay dato público verificable para ninguno todavía. En cuanto
+ * existan los perfiles de Instagram y LinkedIn entran como `sameAs`.
  */
 function organizationNode() {
   return {
@@ -222,6 +225,22 @@ function organizationNode() {
     },
     image: absoluteUrl(OG_IMAGE_PATH),
     founder: { '@id': FOUNDER_ID },
+    /* Se emiten solo si hay dato en site.ts: un campo vacío en el JSON-LD es
+       peor que su ausencia. */
+    ...(site.founder.phone ? { telephone: site.founder.phone } : {}),
+    ...(site.founder.email ? { email: site.founder.email } : {}),
+    ...(site.founder.phone || site.founder.email
+      ? {
+          contactPoint: {
+            '@type': 'ContactPoint',
+            contactType: 'customer service',
+            ...(site.founder.phone ? { telephone: site.founder.phone } : {}),
+            ...(site.founder.email ? { email: site.founder.email } : {}),
+            areaServed: 'MX',
+            availableLanguage: 'es',
+          },
+        }
+      : {}),
     address: {
       '@type': 'PostalAddress',
       addressLocality: 'Querétaro',
@@ -252,6 +271,7 @@ function founderNode() {
     jobTitle: 'Fundador',
     worksFor: { '@id': ORG_ID },
     url: absoluteUrl('/nosotros'),
+    ...(site.founder.photoSrc ? { image: absoluteUrl(site.founder.photoSrc) } : {}),
   };
 }
 

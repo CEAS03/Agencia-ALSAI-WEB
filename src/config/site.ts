@@ -1,6 +1,6 @@
 /**
  * ─────────────────────────────────────────────────────────────────────────
- *  CONFIGURACIÓN CENTRAL DE LA TARJETA DIGITAL ALSAI
+ *  CONFIGURACIÓN CENTRAL DEL SITIO WEB DE ALSAI
  *  Todo lo editable vive aquí: identidad, contacto, enlaces e integraciones.
  *  Ningún componente contiene datos duros; edita este archivo y despliega.
  * ─────────────────────────────────────────────────────────────────────────
@@ -42,17 +42,24 @@ export const site = {
     role: 'Fundador de Agencia ALSAI',
     location: 'Querétaro, Qro.',
     /** Ruta a la fotografía (colócala en /public, p. ej. "/carlos.jpg"). null = monograma elegante. */
-    photoSrc: null as string | null,
-    /** Datos de contacto para la vCard. Vacíos = el botón avisa "muy pronto" sin inventar datos. */
-    phone: '',
-    email: '',
+    photoSrc: '/carlos-alvarez.jpg' as string | null,
+    /**
+     * Datos de contacto para la vCard y el JSON-LD. Vacíos = el botón avisa
+     * "muy pronto" sin inventar datos. El teléfono va en E.164 (+52 = México)
+     * para que marque bien desde cualquier país.
+     */
+    phone: '+524423216811',
+    email: 'agencia.alsai@gmail.com',
   },
 
   links: {
-    website: '',
+    website: 'https://www.agencia-alsai.com/',
     instagram: '',
     linkedin: '',
-    whatsapp: '',
+    /** El `text=` precarga el mensaje y sirve para atribuir de dónde viene el lead. */
+    whatsapp:
+      'https://wa.me/524423216811?text=' +
+      encodeURIComponent('Hola Carlos, vi el sitio de ALSAI y quiero saber más.'),
     privacy: '/aviso-de-privacidad',
   } satisfies SiteLinks as SiteLinks,
 

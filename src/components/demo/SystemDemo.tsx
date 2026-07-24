@@ -51,6 +51,7 @@ export function SystemDemo({ script, id }: { script: DemoScript; id?: string }) 
   const [inView, setInView] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const chatRef = useRef<HTMLDivElement>(null);
+  const eventsRef = useRef<HTMLDivElement>(null);
 
   /* Solo corre cuando la demo es visible. */
   useEffect(() => {
@@ -81,11 +82,14 @@ export function SystemDemo({ script, id }: { script: DemoScript; id?: string }) 
     if (shown >= total) setPlaying(false);
   }, [shown, total]);
 
-  /* La conversación siempre muestra el último mensaje. */
+  /* Chat y bitácora siempre muestran lo último: son 10 eventos en un panel
+     que no cabe entero, y el desenlace (seguimiento, equipo, dashboard) es
+     justo el final. */
   useEffect(() => {
-    const chat = chatRef.current;
-    if (!chat) return;
-    chat.scrollTo({ top: chat.scrollHeight, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
+    const behavior = prefersReducedMotion() ? 'auto' : 'smooth';
+    for (const el of [chatRef.current, eventsRef.current]) {
+      el?.scrollTo({ top: el.scrollHeight, behavior });
+    }
   }, [shown]);
 
   const steps = script.steps.slice(0, shown);
@@ -135,24 +139,28 @@ export function SystemDemo({ script, id }: { script: DemoScript; id?: string }) 
       <div className="dm-sys" data-fx="rise" data-fx-delay="0.12">
         <p className="dm-sys-title microlabel">El sistema, detrás</p>
         <div className="dm-events">
+          {/* El riel vive fuera de la capa que scrollea: si no, se iría hacia
+              arriba junto con los eventos. */}
           <span className="dm-rail" aria-hidden="true" />
-          {events.length === 0 && (
-            <p className="dm-empty">Cada acción del agente quedará registrada aquí.</p>
-          )}
-          {events.map((ev, i) => (
-            <div
-              key={i}
-              className={`dm-event dm-k-${ev.kind}${i === events.length - 1 ? ' is-latest' : ''}`}
-            >
-              <span className="dm-ev-icon">
-                <EventIcon kind={ev.kind} />
-              </span>
-              <div>
-                <p className="dm-ev-sys">{ev.system}</p>
-                <p className="dm-ev-detail">{ev.detail}</p>
+          <div className="dm-events-scroll" ref={eventsRef}>
+            {events.length === 0 && (
+              <p className="dm-empty">Cada acción del agente quedará registrada aquí.</p>
+            )}
+            {events.map((ev, i) => (
+              <div
+                key={i}
+                className={`dm-event dm-k-${ev.kind}${i === events.length - 1 ? ' is-latest' : ''}`}
+              >
+                <span className="dm-ev-icon">
+                  <EventIcon kind={ev.kind} />
+                </span>
+                <div>
+                  <p className="dm-ev-sys">{ev.system}</p>
+                  <p className="dm-ev-detail">{ev.detail}</p>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
         {/* ── Controles ── */}
