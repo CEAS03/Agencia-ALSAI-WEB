@@ -1,8 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
 
-  "//": "Cada ruta se publica como HTML estático propio (scripts/prerender.mjs), así que ya NO hay reescritura comodín al index: era ella la que hacía que /robots.txt y /sitemap.xml respondieran HTML con status 200, y que cualquier URL inexistente devolviera 200 en vez de 404.",
-
   "cleanUrls": true,
   "trailingSlash": false,
 

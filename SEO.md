@@ -19,6 +19,17 @@ descripción y un `<body>` sin contenido. Eso rompía tres cosas:
 - **`robots.txt` y `sitemap.xml`.** La reescritura comodín de `vercel.json`
   los devolvía como HTML con status 200, así que no existían de verdad.
 
+> **Por qué `vercel.json` ya no tiene reescritura comodín.** Ahora cada ruta se
+> publica como su propio HTML estático (`scripts/prerender.mjs` + `cleanUrls`),
+> así que la reescritura al `index` sobra: era ella la que hacía que
+> `/robots.txt` y `/sitemap.xml` respondieran HTML con status 200, y que
+> cualquier URL inexistente devolviera 200 en vez de 404.
+>
+> ⚠️ **No metas comentarios en `vercel.json`.** El esquema de Vercel rechaza
+> propiedades extra: una clave `"//"` usada como comentario hace fallar el
+> deploy con `Invalid vercel.json - should NOT have additional property "//"`,
+> **antes** de que arranque el build (aparece como Error con `Builds . [0ms]`).
+
 La solución es **prerender en tiempo de build**: `scripts/prerender.mjs`
 renderiza cada ruta con `react-dom/server` y escribe un HTML real por página.
 En el navegador, `src/main.tsx` **hidrata** ese HTML en lugar de repintarlo,
