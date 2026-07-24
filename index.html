@@ -8,6 +8,17 @@
     />
     <meta name="theme-color" content="#040a16" />
 
+    <!--
+      Verificación de propiedad de Google Search Console. Va aquí y no en
+      seo.config.ts porque es constante para todo el sitio, no por ruta; el
+      prerender la copia tal cual a las diez páginas. NO la borres: si
+      desaparece, Search Console revoca el acceso a la propiedad.
+    -->
+    <meta
+      name="google-site-verification"
+      content="iU4gBH8Pb-DITJcLcZC0azg6f3qVnYMp-gY7ikYBVWY"
+    />
+
     <!-- Las etiquetas de analítica se cargan desde src/lib/analytics.ts. -->
     <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
     <link rel="dns-prefetch" href="https://www.googletagmanager.com" />

@@ -128,9 +128,16 @@ export function initAnalytics(): void {
     injectScript(`https://www.googletagmanager.com/gtm.js?id=${GTM_ID}`, 'gtm-loader');
   } else if (GA4_ID) {
     injectScript(`https://www.googletagmanager.com/gtag/js?id=${GA4_ID}`, 'ga4-loader');
-    const gtag: Gtag = (...args) => {
-      win.dataLayer!.push(args);
-    };
+    /**
+     * Tiene que empujar el objeto `arguments`, NO un array. gtag.js reconoce
+     * sus comandos por el tipo de lo que llega al dataLayer y solo procesa
+     * `[object Arguments]`; con un array normal registra el contenedor, no
+     * lanza ningún error en consola… y no envía un solo hit. Por eso esto no
+     * puede simplificarse a `push(args)` aunque lo parezca.
+     */
+    const gtag = function (this: unknown) {
+      win.dataLayer!.push(arguments);
+    } as Gtag;
     win.gtag = gtag;
     gtag('js', new Date());
     /* El page_view lo emitimos nosotros en cada cambio de ruta del SPA. */

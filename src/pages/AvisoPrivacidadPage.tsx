@@ -27,7 +27,7 @@ export default function AvisoPrivacidadPage() {
               style={{ marginTop: 16 }}
             />
             <p className="priv-updated" data-fx="rise">
-              Última actualización: julio 2026
+              Última actualización: 23 de julio de 2026
             </p>
 
             <div className="priv-hl" data-fx="rise">
@@ -74,7 +74,30 @@ export default function AvisoPrivacidadPage() {
                 Tratamos tu información y la de tus clientes o pacientes con estricta
                 confidencialidad. Aplicamos medidas razonables de seguridad y solo el equipo de
                 ALSAI accede a ella para prestarte el servicio. No se transfiere a terceros
-                ajenos, salvo obligación legal.
+                ajenos, salvo obligación legal o los servicios de medición descritos abajo, que
+                nunca reciben tus datos de contacto.
+              </p>
+            </div>
+
+            <div data-fx="rise">
+              <h2>Cookies y medición</h2>
+              <p>
+                Este sitio usa <strong>Google Analytics</strong> para entender cómo se navega
+                (qué páginas se visitan, desde dónde se llega y qué botones se usan) y así
+                mejorarlo. Esa herramienta instala cookies propias de Google y recibe datos de
+                navegación, incluida tu dirección IP, que Google trata conforme a sus propias
+                políticas.
+              </p>
+              <p>
+                Lo que <strong>no</strong> enviamos a la medición: tu nombre, tu WhatsApp, tu
+                correo ni tus respuestas del diagnóstico. El sistema descarta automáticamente
+                cualquier dato personal antes de registrar un evento; esa información viaja
+                únicamente a ALSAI y a las herramientas con las que te damos seguimiento.
+              </p>
+              <p>
+                Puedes bloquear estas cookies desde la configuración de tu navegador o con la
+                extensión oficial de exclusión de Google Analytics. El sitio funciona igual sin
+                ellas.
               </p>
             </div>
 
