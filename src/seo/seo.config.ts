@@ -256,11 +256,11 @@ function organizationNode() {
       postalCode: '76060',
       addressCountry: 'MX',
     },
-    /* Horario de atención, no de un mostrador. SUPUESTO: de lunes a viernes;
-       Carlos dio la franja (08:00–20:00) sin especificar días. */
+    /* Horario de atención, no de un mostrador: lunes a sábado, 08:00–20:00
+       (confirmado por Carlos el 2026-07-23). */
     openingHoursSpecification: {
       '@type': 'OpeningHoursSpecification',
-      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
       opens: '08:00',
       closes: '20:00',
     },
