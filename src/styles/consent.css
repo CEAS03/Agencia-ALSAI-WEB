@@ -1,0 +1,153 @@
+/* ── Aviso de cookies y salto de contenido ──────────────────────────────
+   La clase raíz es `.cookie-consent`, NO `.consent`: el formulario del
+   diagnóstico ya usa `.consent` para su casilla de consentimiento
+   (diagnostic.css). Al compartir nombre, este bloque —cargado después—
+   convertía esa casilla en un panel `position: fixed` anclado al borde
+   inferior que tapaba el botón "Recibir mi diagnóstico" y hacía el
+   formulario imposible de enviar. Los hijos (`.consent-copy`,
+   `.consent-actions`, `.consent-btn`) no colisionan con los del
+   formulario (`.consent-box`, `.consent-text`, `.consent-link`). */
+
+.cookie-consent {
+  position: fixed;
+  left: 50%;
+  bottom: calc(16px + var(--safe-bottom));
+  transform: translateX(-50%);
+  /* Escala del sitio: menú móvil 49 · navbar 50 · overlay del diagnóstico
+     60 · toasts 90 · transición de página 100.
+
+     El aviso va SOBRE el overlay a propósito: /diagnostico lo abre solo a
+     los 650 ms, así que por debajo el usuario no podría decidir nunca
+     sobre las cookies. Estar encima tiene un precio —tapaba el botón
+     "Recibir mi diagnóstico"—, y ese precio se paga en diagnostic.css:
+     `.diag-content` reserva `--consent-h` de espacio inferior mientras el
+     aviso está en pantalla, así que ambos caben sin estorbarse. */
+  z-index: 90;
+  width: min(680px, calc(100vw - 28px));
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-card);
+  background: var(--glass-strong);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 18px 50px rgba(2, 6, 16, 0.55);
+  animation: consent-in var(--dur-panel) var(--ease-panel) both;
+}
+
+@keyframes consent-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 14px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.consent-copy {
+  flex: 1 1 300px;
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 0.86rem;
+  line-height: 1.5;
+  color: var(--ink-dim);
+}
+
+.consent-copy a {
+  color: var(--electric);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.consent-actions {
+  display: flex;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.consent-btn {
+  /* 44px de alto real: objetivo táctil accesible (WCAG 2.5.5). */
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: var(--r-pill);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--dur-quick) var(--ease-out),
+    border-color var(--dur-quick) var(--ease-out);
+}
+
+.consent-btn.primary {
+  border: 1px solid transparent;
+  background: var(--electric);
+  color: #04101f;
+}
+
+.consent-btn.primary:hover {
+  background: #6bb0ff;
+}
+
+.consent-btn.ghost {
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  color: var(--ink);
+}
+
+.consent-btn.ghost:hover {
+  border-color: var(--electric);
+}
+
+@media (max-width: 520px) {
+  .consent-actions {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .consent-btn {
+    flex: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cookie-consent {
+    animation: none;
+  }
+}
+
+/* ── Skip link ──────────────────────────────────────────────────────────
+   Fuera de pantalla hasta recibir foco: invisible con ratón, primer
+   elemento tabulable para quien navega con teclado (WCAG 2.4.1). */
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  padding: 12px 18px;
+  border-radius: 0 0 var(--r-chip) 0;
+  background: var(--electric);
+  color: #04101f;
+  font-family: var(--font-body);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  left: 0;
+}
+
+/* ── Objetivos táctiles (WCAG 2.5.5) ────────────────────────────────────
+   Los enlaces del footer heredaban la altura del texto (~20 px), por debajo
+   del mínimo cómodo en móvil. Se les da 44 px de alto real centrando el
+   texto: el enlace crece hacia afuera, la tipografía no se mueve. */
+
+.sfooter-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}

@@ -45,6 +45,12 @@ export interface LeadData {
   whatsapp: string;
   email: string;
   consent: boolean;
+  /**
+   * Honeypot: campo oculto que una persona nunca ve ni llena. Si llega con
+   * contenido, el envío viene de un bot y n8n lo descarta. No es dato del
+   * lead, por eso el adaptador lo saca de `lead` antes de enviarlo.
+   */
+  hp?: string;
 }
 
 export interface SessionMeta {

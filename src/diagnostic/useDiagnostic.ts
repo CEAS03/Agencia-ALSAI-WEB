@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { track } from '../lib/analytics';
 import { setEcoMode } from '../scene/ecosystem';
 import { createDiagnosticAdapter } from './adapter';
+import { flushOutbox, installUnloadFlush } from './delivery';
 import { evaluarDiagnostico, type ResultadoDiagnostico } from './engine/scoring';
 import { clearSnapshot, loadSnapshot, saveSnapshot } from './persistence';
 import type { LeadData, QuestionPayload, StepAnswers } from './types';
@@ -27,6 +28,12 @@ export interface DiagnosticState {
   error: string | null;
   busy: boolean;
   lead: LeadData | null;
+  /**
+   * true = el lead quedó capturado pero el webhook no confirmó la entrega.
+   * Está en la cola durable y la pantalla final ofrece la salida por
+   * WhatsApp. Nunca se le dice al usuario "listo" si no lo está.
+   */
+  deliveryPending: boolean;
   meeting: 'idle' | 'requesting' | 'done';
   /** Respuestas acumuladas por pregunta: alimentan el motor de scoring. */
   answers: Record<string, StepAnswers>;
@@ -60,10 +67,18 @@ export function useDiagnostic() {
     error: null,
     busy: false,
     lead: null,
+    deliveryPending: false,
     meeting: 'idle',
     answers: {},
     result: null,
   });
+
+  /* Rescate de leads de visitas anteriores: si un envío quedó en la cola
+     durable (red caída, Railway dormido), entra en cuanto vuelve el usuario. */
+  useEffect(() => {
+    installUnloadFlush();
+    void flushOutbox();
+  }, []);
 
   const patch = useCallback((p: Partial<DiagnosticState>) => {
     setState((s) => ({ ...s, ...p }));
@@ -105,6 +120,7 @@ export function useDiagnostic() {
         lastAnswer: state.lastAnswer,
         analysisNote: state.analysisNote,
         lead: state.lead,
+        deliveryPending: state.deliveryPending,
         meeting: state.meeting,
         answers: state.answers,
         result: state.result,
@@ -119,6 +135,7 @@ export function useDiagnostic() {
     state.lastAnswer,
     state.analysisNote,
     state.lead,
+    state.deliveryPending,
     state.meeting,
     state.answers,
     state.result,
@@ -233,14 +250,20 @@ export function useDiagnostic() {
         await adapter.submitLead(lead, state.result ?? undefined);
         /* Un solo evento por conversión: `diagnostic_complete` ya se emitió
            al calcular el resultado; aquí lo que ocurre es la captura del lead. */
-        track('generate_lead', { origen: 'diagnostico' });
+        track('generate_lead', { origen: 'diagnostico', entrega: 'ok' });
         setEcoMode('success');
-        patch({ phase: 'ready', lead });
+        patch({ phase: 'ready', lead, deliveryPending: false });
       } catch {
-        patch({
-          phase: 'lead',
-          error: 'No pudimos enviar tus datos. Revisa tu conexión e intenta de nuevo.',
-        });
+        /**
+         * El envío falló tras los reintentos, pero el lead YA está en la cola
+         * durable: se reintentará solo en la próxima visita. Bloquear aquí al
+         * usuario sería lo peor posible —abandonaría y perderíamos el contacto
+         * por ambos lados—, así que avanzamos y la pantalla final ofrece
+         * WhatsApp como vía alterna, diciendo la verdad sobre el estado.
+         */
+        track('generate_lead', { origen: 'diagnostico', entrega: 'pendiente' });
+        setEcoMode('success');
+        patch({ phase: 'ready', lead, deliveryPending: true, error: null });
       }
     },
     [adapter, patch, state.result],

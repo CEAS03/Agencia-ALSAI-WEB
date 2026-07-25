@@ -154,7 +154,11 @@
   overscroll-behavior: contain;
   display: flex;
   flex-direction: column;
-  padding-bottom: calc(26px + var(--safe-bottom));
+  /* `--consent-h` la publica ConsentBanner con su altura real mientras el
+     aviso de cookies está en pantalla (0 si ya se decidió). Sin esta
+     reserva el aviso —que va por encima del overlay— tapaba el botón
+     "Recibir mi diagnóstico" y el formulario no se podía enviar. */
+  padding-bottom: calc(26px + var(--safe-bottom) + var(--consent-h, 0px));
   /* Se puede desplazar, pero sin barra visible. */
   scrollbar-width: none;
   -ms-overflow-style: none;

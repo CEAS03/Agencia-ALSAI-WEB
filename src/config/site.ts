@@ -48,7 +48,7 @@ export const site = {
      * "muy pronto" sin inventar datos. El teléfono va en E.164 (+52 = México)
      * para que marque bien desde cualquier país.
      */
-    phone: '+524423216811',
+    phone: '+524423961718',
     email: 'agencia.alsai@gmail.com',
   },
 
@@ -60,18 +60,37 @@ export const site = {
     linkedin: '',
     /** El `text=` precarga el mensaje y sirve para atribuir de dónde viene el lead. */
     whatsapp:
-      'https://wa.me/524423216811?text=' +
+      'https://wa.me/524423961718?text=' +
       encodeURIComponent('Hola Carlos, vi el sitio de ALSAI y quiero saber más.'),
     privacy: '/aviso-de-privacidad',
   } satisfies SiteLinks as SiteLinks,
 
   integrations: {
     /**
+     * Endpoint propio que escribe en HubSpot (`api/hubspot-lead.ts`, función
+     * serverless de Vercel). Vive en el mismo dominio, así que el token del
+     * CRM nunca llega al navegador y no hace falta CORS.
+     * Es el registro que manda; n8n queda para Sheets, correo y WhatsApp.
+     * Se limpia igual que la URL de n8n por la misma trampa del BOM.
+     */
+    crmEndpoint: ((import.meta.env.VITE_CRM_ENDPOINT as string | undefined) ?? '/api/hubspot-lead')
+      .replace(/^﻿/, '')
+      .trim(),
+    /**
      * Webhook de n8n para el diagnóstico. Vacío = modo demo con guion local.
      * Se limpia de espacios y BOM: pegar la URL en el panel de Vercel puede
      * arrastrar un ﻿ invisible que convertiría la URL en ruta relativa.
      */
     n8nWebhookUrl: ((import.meta.env.VITE_N8N_WEBHOOK_URL as string | undefined) ?? '')
+      .replace(/^﻿/, '')
+      .trim(),
+    /**
+     * Firma compartida con el workflow de n8n. NO es un secreto —viaja en el
+     * bundle público— sino un filtro: obliga a quien quiera spamear el
+     * webhook a leer el JS primero, y permite rotarla sin tocar código.
+     * Vacía = n8n acepta igual (retrocompatible).
+     */
+    n8nWebhookToken: ((import.meta.env.VITE_N8N_WEBHOOK_TOKEN as string | undefined) ?? '')
       .replace(/^﻿/, '')
       .trim(),
     hubspot: {

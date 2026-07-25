@@ -458,6 +458,7 @@ function LeadForm({ controller }: { controller: DiagnosticController }) {
     whatsapp: '',
     email: '',
     consent: false,
+    hp: '',
   });
   const [errors, setErrors] = useState<FieldErrors>({});
 
@@ -497,6 +498,29 @@ function LeadForm({ controller }: { controller: DiagnosticController }) {
       {error && <p className="diag-error" role="alert">{error}</p>}
 
       <form className="diag-form" onSubmit={submit} noValidate>
+        {/*
+          Honeypot. Fuera de pantalla en vez de `display:none`: los bots que
+          valen algo ignoran lo oculto por CSS, pero sí rellenan un input de
+          texto con nombre plausible. Invisible para lectores de pantalla
+          (aria-hidden) y fuera del recorrido de teclado (tabIndex -1), así
+          que ninguna persona puede llenarlo por accidente.
+        */}
+        <div
+          aria-hidden="true"
+          style={{ position: 'absolute', left: '-9999px', width: 1, height: 1, overflow: 'hidden' }}
+        >
+          <label htmlFor="f-company-url">No llenar</label>
+          <input
+            id="f-company-url"
+            name="company_url"
+            type="text"
+            tabIndex={-1}
+            autoComplete="off"
+            value={form.hp ?? ''}
+            onChange={(e) => set('hp', e.target.value)}
+          />
+        </div>
+
         <div className="field">
           <label htmlFor="f-name">Nombre</label>
           <input
@@ -569,7 +593,7 @@ function LeadForm({ controller }: { controller: DiagnosticController }) {
             <button type="button" className="consent-link" onClick={privacy}>
               aviso de privacidad
             </button>{' '}
-            y que ALSAI me contacte sobre este diagnóstico.
+            y que ALSAI me envíe mi diagnóstico por WhatsApp y correo.
           </span>
         </label>
         {errors.consent && <p className="field-error">{errors.consent}</p>}
@@ -591,7 +615,23 @@ function ReadyPanel({
   controller: DiagnosticController;
   onRequestClose: () => void;
 }) {
-  const { lead, meeting, error } = controller.state;
+  const { lead, meeting, error, deliveryPending } = controller.state;
+
+  /**
+   * Vía alterna cuando el webhook no confirmó. El lead ya está en la cola
+   * durable y se reintentará solo, pero no dejamos que la conversación
+   * dependa de eso: este enlace la abre de inmediato y con contexto.
+   */
+  const whatsappFallback = () => {
+    const numero = site.founder.phone.replace(/\D/g, '');
+    const texto =
+      `Hola Carlos, terminé el diagnóstico en el sitio de ALSAI` +
+      (lead?.name ? `. Soy ${lead.name}` : '') +
+      (lead?.clinic ? ` de ${lead.clinic}` : '') +
+      `. ¿Me compartes mis resultados?`;
+    return `https://wa.me/${numero}?text=${encodeURIComponent(texto)}`;
+  };
+
   return (
     <div className="diag-panel diag-ready">
       <svg className="seal" viewBox="0 0 72 72" aria-hidden="true">
@@ -599,13 +639,37 @@ function ReadyPanel({
         <path className="seal-check" d="M24 37.5l8.5 8.5L49 28" pathLength="100" />
       </svg>
 
-      <h2 className="diag-title center">Diagnóstico en proceso</h2>
+      <h2 className="diag-title center">
+        {deliveryPending ? 'Tu diagnóstico está listo' : 'Diagnóstico en proceso'}
+      </h2>
       <p className="diag-copy center">
-        Gracias{lead?.name ? `, ${lead.name.split(' ')[0]}` : ''}. Analizaremos las respuestas
-        {lead?.clinic ? ` de ${lead.clinic}` : ''} y te enviaremos el diagnóstico por WhatsApp.
+        {deliveryPending ? (
+          <>
+            Gracias{lead?.name ? `, ${lead.name.split(' ')[0]}` : ''}. Guardamos tus respuestas, pero
+            la conexión falló al enviarlas. Lo reintentamos solos; para no esperar, escríbenos por
+            WhatsApp y te lo entregamos ahora.
+          </>
+        ) : (
+          <>
+            Gracias{lead?.name ? `, ${lead.name.split(' ')[0]}` : ''}. Analizaremos las respuestas
+            {lead?.clinic ? ` de ${lead.clinic}` : ''} y te enviaremos el diagnóstico por WhatsApp.
+          </>
+        )}
       </p>
 
       {error && <p className="diag-error" role="alert">{error}</p>}
+
+      {deliveryPending && (
+        <a
+          className="diag-btn-primary"
+          href={whatsappFallback()}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => track('whatsapp_click', { origen: 'fallback_diagnostico' })}
+        >
+          Recibir mi diagnóstico por WhatsApp
+        </a>
+      )}
 
       {meeting === 'done' ? (
         <p className="meeting-done">

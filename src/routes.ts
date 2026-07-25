@@ -78,3 +78,22 @@ export function sourceForPath(pathname: string): string | undefined {
   const clean = pathname.replace(/^\/+|\/+$/g, '');
   return routeDefs.find((r) => r.path === clean)?.src;
 }
+
+/**
+ * Definición que atiende una URL, con las mismas reglas que el router:
+ * ruta vacía → índice, coincidencia exacta y, si no hay ninguna, el
+ * comodín. La usa `main.tsx` para resolver el chunk de la página actual
+ * ANTES de hidratar; sin eso el primer render del cliente pinta el
+ * `Suspense fallback` donde el HTML del build ya traía contenido y React
+ * descarta todo el árbol prerenderizado.
+ */
+export function defForPath(pathname: string): RouteDef | undefined {
+  const clean = pathname.replace(/^\/+|\/+$/g, '');
+  if (clean === '') return routeDefs.find((r) => r.index);
+  return routeDefs.find((r) => r.path === clean) ?? routeDefs.find((r) => r.path === '*');
+}
+
+/** Clave con la que `App` indexa los componentes ya resueltos. */
+export function keyForDef(def: RouteDef): string {
+  return def.index ? 'index' : (def.path as string);
+}

@@ -6,6 +6,7 @@ import { DiagnosticOverlay } from '../../diagnostic/DiagnosticOverlay';
 import { useDiagnostic } from '../../diagnostic/useDiagnostic';
 import { Toaster } from '../../lib/toast';
 import { track } from '../../lib/analytics';
+import { ConsentBanner } from '../ConsentBanner';
 import { TransitionProvider } from './PageTransition';
 import { DiagnosticContext } from '../ui/buttons';
 import { NavBar } from './NavBar';
@@ -42,6 +43,10 @@ export function Layout() {
 
       <TransitionProvider>
         <DiagnosticContext.Provider value={{ open: diagnostic.open }}>
+          {/* Primer elemento tabulable del documento: salta el menú. */}
+          <a className="skip-link" href="#contenido">
+            Saltar al contenido
+          </a>
           <CursorHalo />
           <NavBar />
           <main id="contenido">
@@ -50,6 +55,7 @@ export function Layout() {
           <SiteFooter />
           <DiagnosticOverlay controller={diagnostic} />
           <Toaster />
+          <ConsentBanner />
         </DiagnosticContext.Provider>
       </TransitionProvider>
     </>

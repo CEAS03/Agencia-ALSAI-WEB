@@ -10,7 +10,10 @@
     "build:client": "vite build",
     "gen:assets": "node scripts/gen-assets.mjs",
     "preview": "vite preview",
-    "test": "node --test src/diagnostic/engine/scoring.test.ts"
+    "test": "node --test src/diagnostic/engine/scoring.test.ts src/diagnostic/engine/soluciones.test.ts",
+    "test:crm": "node --experimental-strip-types scripts/test-hubspot-lead.mjs",
+    "hubspot:setup": "node scripts/hubspot-setup.mjs",
+    "test:n8n": "node --experimental-strip-types n8n/probar-preparar-lead.mjs"
   },
   "dependencies": {
     "@fontsource-variable/outfit": "^5.2.5",
@@ -22,6 +25,7 @@
     "three": "^0.172.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@types/node": "^26.1.1",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",

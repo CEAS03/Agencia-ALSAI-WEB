@@ -1,4 +1,7 @@
 import type { StepAnswers } from '../types';
+/* La extensión es obligatoria: `node --test` ejecuta el TypeScript tal cual
+ * y no resuelve extensiones. `allowImportingTsExtensions` la admite en tsc. */
+import { construirPlan, type PlanSugerido } from './soluciones.ts';
 
 /**
  * ── MOTOR DE SCORING DEL DIAGNÓSTICO ─────────────────────────────────
@@ -96,6 +99,8 @@ export type RespuestasCrudas = Record<string, StepAnswers>;
 export interface ResultadoDiagnostico {
   etapas: Record<EtapaKey, Etapa>;
   impacto: Impacto;
+  /** Qué módulos proponerle y con qué urgencia. Ver `engine/soluciones.ts`. */
+  plan: PlanSugerido;
   meta: {
     tipo_clinica: string;
     infraestructura: string;
@@ -675,9 +680,12 @@ export function evaluarDiagnostico(respuestas: RespuestasCrudas): ResultadoDiagn
     ]),
   ) as Record<EtapaKey, Etapa>;
 
+  const impacto = calcularImpacto(respuestas);
+
   return {
     etapas,
-    impacto: calcularImpacto(respuestas),
+    impacto,
+    plan: construirPlan(respuestas, colores, impacto),
     meta: {
       tipo_clinica: single(respuestas, 'q1-tipo', 'tipo') ?? '',
       infraestructura: single(respuestas, 'q18-sistemas', 'sistemas') ?? '',

@@ -14,6 +14,7 @@
  */
 
 import { site } from '../config/site';
+import { FAQS } from '../content/faq';
 
 export const SITE_URL = 'https://www.agencia-alsai.com';
 export const SITE_NAME = 'Agencia ALSAI';
@@ -82,8 +83,11 @@ export const SERVICES = [
 
 /* ── Metadata por ruta ───────────────────────────────────────────────────── */
 
+/* ~157 caracteres: Google corta la descripción alrededor de los 160 y la
+   versión anterior (189) perdía el diagnóstico, que es la llamada a la
+   acción. Lo importante tiene que caber antes del recorte. */
 const HOME_DESC =
-  'Agencia de inteligencia artificial y automatización en Querétaro. Conectamos marketing, IA, WhatsApp, CRM y seguimiento en un solo sistema de crecimiento. Diagnóstico gratuito en 3 minutos.';
+  'Agencia de IA y automatización en Querétaro. Conectamos marketing, WhatsApp, CRM y seguimiento en un solo sistema de crecimiento. Diagnóstico gratis en 3 min.';
 
 export const ROUTES: RouteSeo[] = [
   {
@@ -344,6 +348,26 @@ function webPageNode(route: RouteSeo) {
   return node;
 }
 
+/**
+ * FAQPage — solo en el home, que es donde el acordeón existe de verdad.
+ * El texto sale de `content/faq.ts`, el mismo que pinta el componente: si
+ * el schema describiera preguntas que no están a la vista, Google lo trata
+ * como structured data engañoso.
+ */
+function faqPageNode() {
+  return {
+    '@type': 'FAQPage',
+    '@id': `${SITE_URL}/#preguntas-frecuentes`,
+    inLanguage: 'es-MX',
+    isPartOf: { '@id': WEBSITE_ID },
+    mainEntity: FAQS.map((item) => ({
+      '@type': 'Question',
+      name: item.q,
+      acceptedAnswer: { '@type': 'Answer', text: item.a },
+    })),
+  };
+}
+
 /** Los seis servicios, solo en /soluciones (donde son contenido visible). */
 function serviceNodes() {
   return SERVICES.map((service) => ({
@@ -368,6 +392,7 @@ export function buildJsonLd(route: RouteSeo): string {
     webPageNode(route),
   ];
 
+  if (route.path === '/') graph.push(faqPageNode());
   if (route.path === '/soluciones') graph.push(...serviceNodes());
 
   return JSON.stringify({ '@context': 'https://schema.org', '@graph': graph });

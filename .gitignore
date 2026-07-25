@@ -11,3 +11,6 @@ dist-ssr
 
 # Artefactos de compilación de TypeScript
 *.tsbuildinfo
+
+# Reportes y capturas de la auditoría QA (scripts/qa-audit.mjs)
+qa-out/

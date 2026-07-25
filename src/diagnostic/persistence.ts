@@ -20,6 +20,7 @@ export interface Snapshot {
     | 'lastAnswer'
     | 'analysisNote'
     | 'lead'
+    | 'deliveryPending'
     | 'meeting'
     | 'answers'
     | 'result'
